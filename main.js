@@ -42,12 +42,22 @@ function createStyleSheet() {
 }
 
 /** Library: Array of books **/
-let myLibrary = [];
+var myLibrary = [];
 
-function addBookToLibrary(library, book) {
-	library.push(book);
+function addBookToLibrary() {
+	let title = prompt("title: ", "title");
+	let author = prompt("author: ", "author");
+	let numberOfPages = prompt("number of pages: ", "0");
+	
+	let book = new Book(title, author, numberOfPages)
+	myLibrary.push(book);
+	
+	let contentElement = document.getElementsByClassName("content")[0];
+	contentElement.appendChild( book.createCard() );
 }
 
+
+// Esta funcion sobra
 function showBooksInLibrary(library) {
 	let contentElement = document.getElementsByClassName("content")[0];
 	
@@ -183,26 +193,20 @@ Book.prototype.createCard = function() {
 
 }
 
-/** Clase ScienceBook, hereda de Book **/
-function ScienceBook (title, author, numberOfPages, notReadYet = true) {
-	
-	Book.call(this, title, author, numberOfPages, notReadYet = true);
-	this.genre = "Scifi";
-}
-
-ScienceBook.prototype = Object.create(Book.prototype);
-ScienceBook.prototype.constructor = ScienceBook;
-
+// Add Book button Event listener
+let buttonElem = document.getElementById("addBook");
+buttonElem.addEventListener("click", addBookToLibrary);
 
 /** Main **/
 createStyleSheet()
 
+/*
 addBookToLibrary ( myLibrary, new Book("The Hobbit", "Tolkien", 300, true) );
 addBookToLibrary ( myLibrary, new Book("A Game of Thrones", "George R. R. Martin", 700, true) );
 addBookToLibrary ( myLibrary, new Book("The First Man in Rome", "McCullough", 879, true) );
 addBookToLibrary ( myLibrary, new Book("Manon Lescaut", "Antoine François Prévost", 240, true) );
 addBookToLibrary ( myLibrary, new Book("La Dame aux Camélias", "Alexandre Dumas fils", 278, true) );
+*/
 
 showBooksInLibrary(myLibrary);
-
 
