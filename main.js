@@ -17,12 +17,13 @@ function createStyleSheet() {
 		.content {\
 			display: flex;\
 			align-items: flex-start;\
-			justify-content: flex-start;\
+			justify-content: center;\
 			flex-wrap: wrap;\
 			border-style: solid;\
 			border-color: black;\
 			border-width: 2px;\
 			border-radius: 10px;\
+			padding: 20px;\
 			}\
 		#addBook {\
 			text-align: center;\
@@ -36,6 +37,7 @@ function createStyleSheet() {
 			max-height: 44px;\
 			font-size: 24px;\
 			padding: 10px ;\
+			cursor:pointer;\
 			}\
 		";
 	document.head.appendChild(styleSheet);
@@ -52,17 +54,70 @@ function addBookToLibrary() {
 	let book = new Book(title, author, numberOfPages)
 	myLibrary.push(book);
 	
-	let contentElement = document.getElementsByClassName("content")[0];
-	contentElement.appendChild( book.createCard() );
+	showBooksInLibrary();
+	
+	/*let contentElement = document.getElementsByClassName("content")[0];
+	contentElement.appendChild( book.createCard() );*/
+}
+
+function removeBookFromLibrary(event) {
+
+	// Buscar el antecedente de clase 'book'
+	let bookDiv = event.currentTarget;
+	while (bookDiv.className != "book") {
+		bookDiv = bookDiv.parentNode;
+	}
+
+	let bookId = bookDiv.dataset.id;
+	
+	myLibrary.forEach(function(book, index, myLibrary) {
+			if (book.id == bookId) myLibrary.splice(index, 1);
+		});
+	
+	showBooksInLibrary(myLibrary);
+}
+
+function markBookAsRead(event) {
+	
+	// Buscar el antecedente de clase 'book'
+	let bookDiv = event.currentTarget;
+	while (bookDiv.className != "book") {
+		bookDiv = bookDiv.parentNode;
+	}
+
+	let bookId = bookDiv.dataset.id;
+	
+	myLibrary.forEach(function(book, index, myLibrary) {
+			if (book.id == bookId) book.notReadYet = ! book.notReadYet;
+		});
+		
+	showBooksInLibrary(myLibrary);
 }
 
 
-// Esta funcion sobra
-function showBooksInLibrary(library) {
+function showBooksInLibrary() {
 	let contentElement = document.getElementsByClassName("content")[0];
 	
-	for (let index in library) {
-		contentElement.appendChild( library[index].createCard() );
+	// borrar todos los hijos actuales (elementos HTML de cada libro)
+	contentElement.innerHTML = '';
+	
+	if (myLibrary.length == 0) {
+		let libEmpty = document.createElement("p");
+		libEmpty.innerText = "The Library Is Empty";
+		libEmpty.style = "\
+			padding: 0px;\
+			text-align: center;\
+			font-family: cursive;\
+			font-size: 26px;\
+			color: gray;\
+			margin: 0;\
+		"
+		contentElement.appendChild( libEmpty );
+	} else {
+		// volver a generar los hijos en funcion de la libreria
+		for (let index in myLibrary) {
+			contentElement.appendChild( myLibrary[index].createCard() );
+		}
 	}
 }
 
@@ -123,6 +178,8 @@ Book.prototype.createCard = function() {
 	let delButtonDiv = document.createElement("div");
 	let delButtonText = document.createElement("p");
 	
+	delButtonText.id = "delButton";
+	
 	delButtonText.innerText = "Remove Book";
 
 	delButtonDiv.style = "\
@@ -136,6 +193,7 @@ Book.prototype.createCard = function() {
 			border-radius: 10px;\
 			width: 110px;\
 			height: 20px;\
+			cursor:pointer;\
 	"
 	delButtonText.style = "\
 			text-align: center;\
@@ -146,6 +204,8 @@ Book.prototype.createCard = function() {
 			padding: 1px;\
 	"
 	
+	delButtonDiv.addEventListener("click", removeBookFromLibrary);
+	
 	delButtonDiv.appendChild(delButtonText);
 	buttonsDiv.appendChild(delButtonDiv);
 
@@ -153,7 +213,9 @@ Book.prototype.createCard = function() {
 	let readButtonDiv = document.createElement("div");
 	let readButtonText = document.createElement("p");
 	
-	readButtonText.innerText = "Mark as Read";
+	readButtonText.innerText = "Toggle Read";
+
+	readButtonText.id = "readButton";
 
 	readButtonDiv.style = "\
 			display: flex;\
@@ -166,6 +228,7 @@ Book.prototype.createCard = function() {
 			border-radius: 10px;\
 			width: 110px;\
 			height: 20px;\
+			cursor:pointer;\
 	"
 
 	readButtonText.style = "\
@@ -176,7 +239,9 @@ Book.prototype.createCard = function() {
 			height: 20px;\
 			padding: 1px;\
 	"
-
+	
+	readButtonDiv.addEventListener("click", markBookAsRead);
+	
 	readButtonDiv.appendChild(readButtonText);
 	buttonsDiv.appendChild(readButtonDiv);
 
