@@ -43,7 +43,22 @@ function createStyleSheet() {
 }
 
 /** Library: Array of books **/
-var myLibrary = [];
+var myLibrary = recoverLibraryFromLocalStorage();
+
+//localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
+
+// Desde JSON recuperamos objetos genéricos de tipo Object, no se guarda el tipo de objeto original (Book)
+function recoverLibraryFromLocalStorage() {
+	if (localStorage.getItem("myLibrary") === null) {
+		return [];
+	} else {
+		myLibrary = JSON.parse(localStorage.getItem("myLibrary"));
+		for (let index in myLibrary) {
+			myLibrary[index] = copyObjectToBook(myLibrary[index]);
+		}
+		return myLibrary;
+	}
+}
 
 function addBookToLibrary() {
 	
@@ -51,15 +66,19 @@ function addBookToLibrary() {
 	let author = document.getElementById("authorForm").value;
 	let numberOfPages = document.getElementById("numberOfPagesForm").value;
 	
-	console.log("title: " + title);
-	
 	if (title == "" || author == "" || numberOfPages == "") {
 		alert ("The fields cannot be empty");
+		showAddBookForm();
 		return;
 	}
 	
 	let book = new Book(title, author, numberOfPages)
+	myLibrary = recoverLibraryFromLocalStorage();
 	myLibrary.push(book);
+	
+	localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
+	
+	document.getElementById("addBookForm").reset(); // reset form for next time
 	
 	showBooksInLibrary();
 	
@@ -75,8 +94,11 @@ function addBookToLibrary_old() {
 	let numberOfPages = prompt("number of pages: ", "0");
 	
 	let book = new Book(title, author, numberOfPages)
+	
+	myLibrary = recoverLibraryFromLocalStorage();
 	myLibrary.push(book);
 	
+	localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
 	showBooksInLibrary();
 	
 	/*let contentElement = document.getElementsByClassName("content")[0];
@@ -93,10 +115,12 @@ function removeBookFromLibrary(event) {
 
 	let bookId = bookDiv.dataset.id;
 	
+	myLibrary = recoverLibraryFromLocalStorage();
 	myLibrary.forEach(function(book, index, myLibrary) {
 			if (book.id == bookId) myLibrary.splice(index, 1);
 		});
 	
+	localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
 	showBooksInLibrary(myLibrary);
 }
 
@@ -110,20 +134,25 @@ function markBookAsRead(event) {
 
 	let bookId = bookDiv.dataset.id;
 	
-	myLibrary.forEach(function(book, index, myLibrary) {
-			if (book.id == bookId) book.notReadYet = ! book.notReadYet;
-		});
-	bookDiv.classList.toggle("notReadYet");
-	 
-	showBooksInLibrary(myLibrary);
-}
+	myLibrary = recoverLibraryFromLocalStorage();
 
+	myLibrary.forEach(function(book, index, myLibrary) {
+		if (book.id == bookId) book.notReadYet = ! book.notReadYet;
+	});
+	bookDiv.classList.toggle("notReadYet");
+	
+	localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
+	 
+	showBooksInLibrary();
+}
 
 function showBooksInLibrary() {
 	let contentElement = document.getElementsByClassName("content")[0];
 	
 	// borrar todos los hijos actuales (elementos HTML de cada libro)
 	contentElement.innerHTML = '';
+	
+	myLibrary = recoverLibraryFromLocalStorage();
 	
 	if (myLibrary.length == 0) {
 		let libEmpty = document.createElement("p");
@@ -146,12 +175,30 @@ function showBooksInLibrary() {
 }
 
 /** Class Book **/
-function Book(title, author, numberOfPages, notReadYet = true) {
+
+function copyObjectToBook(obj) {
+	if (obj == null) {
+		return null;
+	} else {
+		let returnValue = new Book(obj.title, obj.author, obj.numberOfPages, obj.notReadYet, obj.id);
+		return returnValue;
+	}
+}
+
+function Book(title, author, numberOfPages, notReadYet = true, id = null) {
 	this.title = title;
 	this.author = author;
 	this.numberOfPages = numberOfPages;
 	this.notReadYet = notReadYet;
-	this.id = (Book.prototype.id++)
+	if (id === null) {  //si no le pasamos el id, crear uno nuevo
+		Book.prototype.id = JSON.parse(localStorage.getItem("nextId"));
+		if (Book.prototype.id === null) Book.prototype.id = 0;
+		this.id = (Book.prototype.id++);
+		localStorage.setItem("nextId", JSON.stringify(Book.prototype.id));
+	} else {
+		this.id = id;
+	}
+	
 }
 
 Book.prototype.id = 0;
@@ -176,6 +223,7 @@ Book.prototype.createCard = function() {
 			width: 250px;\
 			height: 120px;\
 			background-image: url('./images/background_white.jpeg');\
+			margin: 1px;\
 	"
 	if (! this.notReadYet) {
 		cardElement.style.color = "gray";
@@ -313,8 +361,8 @@ buttonElem.onclick = showAddBookForm; // When the user clicks on the button, ope
 
 // OK button
 let okButtonElem = document.getElementById("okButton");
-okButtonElem.addEventListener("click", addBookToLibrary);
 okButtonElem.addEventListener("click", hideAddBookForm);
+okButtonElem.addEventListener("click", addBookToLibrary);
 
 // Cancel button
 let  cancelButtonElem = document.getElementById("cancelButton");
@@ -326,12 +374,13 @@ let closeModal = document.getElementsByClassName("close")[0];
 // When the user clicks on <span> (x), close the modal
 closeModal.onclick = hideAddBookForm;
 
-// When the user clicks anywhere outside of the modal, close it
+/*
+ * // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
 	if (event.target == addBookModal) {
 		hideAddBookForm(addBookModal);
 	}
-}
+}*/
 
 /** Main **/
 createStyleSheet()
