@@ -9,11 +9,36 @@
 </head>
 <body style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap:50px;">
 	<div class="header">
-		<div class="button" id="addBook">Add Book</button></div>
+		<div class="button" id="addBook">Add Book</div>
 	</div>
 	<div class="content">
 	</div>
 	
+	<!-- Modal -->
+	<div class="modal" id="addBookModal">
+		<!-- Modal Content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<form id="addBookForm" method="post" style="display: flex; flex-direction:column; gap:10px;">
+				<div class="formField">
+					<label for="titleForm">Title:</label>
+					<input id="titleForm" type="text" placeholder="Title" required />
+				</div>
+				<div class="formField">
+					<label for="authorForm">Author:</label>
+					<input id="authorForm" type="text" placeholder="Author" required />
+				</div>
+				<div class="formField">
+					<label for="numberOfPagesForm">Number of Pages:</label>
+					<input id="numberOfPagesForm" type="text" placeholder="Number of Pages" required />
+				</div>
+			</form>
+			<div class="buttons">
+				<div id="okButton" type="submit">OK</div>
+				<div id="cancelButton">Cancel</div>
+			</div>
+		</div>
+	</div>
+	<script src="./main.js"></script>
 </body>
 </html>
-<script src="./main.js"></script>

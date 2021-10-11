@@ -46,6 +46,30 @@ function createStyleSheet() {
 var myLibrary = [];
 
 function addBookToLibrary() {
+	
+	let title = document.getElementById("titleForm").value;
+	let author = document.getElementById("authorForm").value;
+	let numberOfPages = document.getElementById("numberOfPagesForm").value;
+	
+	console.log("title: " + title);
+	
+	if (title == "" || author == "" || numberOfPages == "") {
+		alert ("The fields cannot be empty");
+		return;
+	}
+	
+	let book = new Book(title, author, numberOfPages)
+	myLibrary.push(book);
+	
+	showBooksInLibrary();
+	
+	/*let contentElement = document.getElementsByClassName("content")[0];
+	contentElement.appendChild( book.createCard() );*/
+}
+
+// deprecated
+function addBookToLibrary_old() {
+	
 	let title = prompt("title: ", "title");
 	let author = prompt("author: ", "author");
 	let numberOfPages = prompt("number of pages: ", "0");
@@ -267,20 +291,50 @@ Book.prototype.createCard = function() {
 
 }
 
-// Add Book button Event listener
+// Add buttons Event listener
+// let buttonElem = document.getElementById("addBook");
+// buttonElem.addEventListener("click", addBookToLibrary);
+
+/** Modal 'addBookModal'**/
+function hideAddBookForm() {
+	document.getElementById("addBookModal").style.display = "none";
+}
+
+function showAddBookForm(modalElement) {
+	document.getElementById("addBookModal").style.display = "block";
+}
+
+// Get the modal
+let addBookModal = document.getElementById("addBookModal");
+
+// Get the button that opens the modal
 let buttonElem = document.getElementById("addBook");
-buttonElem.addEventListener("click", addBookToLibrary);
+buttonElem.onclick = showAddBookForm; // When the user clicks on the button, open the modal
+
+// OK button
+let okButtonElem = document.getElementById("okButton");
+okButtonElem.addEventListener("click", addBookToLibrary);
+okButtonElem.addEventListener("click", hideAddBookForm);
+
+// Cancel button
+let  cancelButtonElem = document.getElementById("cancelButton");
+cancelButtonElem.addEventListener("click", hideAddBookForm);
+
+// Get the <span> element that closes the modal
+let closeModal = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+closeModal.onclick = hideAddBookForm;
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+	if (event.target == addBookModal) {
+		hideAddBookForm(addBookModal);
+	}
+}
 
 /** Main **/
 createStyleSheet()
 
-/*
-addBookToLibrary ( myLibrary, new Book("The Hobbit", "Tolkien", 300, true) );
-addBookToLibrary ( myLibrary, new Book("A Game of Thrones", "George R. R. Martin", 700, true) );
-addBookToLibrary ( myLibrary, new Book("The First Man in Rome", "McCullough", 879, true) );
-addBookToLibrary ( myLibrary, new Book("Manon Lescaut", "Antoine François Prévost", 240, true) );
-addBookToLibrary ( myLibrary, new Book("La Dame aux Camélias", "Alexandre Dumas fils", 278, true) );
-*/
-
-showBooksInLibrary(myLibrary);
+showBooksInLibrary();
 
