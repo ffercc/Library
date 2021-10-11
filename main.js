@@ -221,7 +221,8 @@ Book.prototype.createCard = function() {
 			border-radius: 10px;\
 			padding: 10px;\
 			width: 250px;\
-			height: 120px;\
+			max-width: 500px;\
+			min-height: 120px;\
 			background-image: url('./images/background_white.jpeg');\
 			margin: 1px;\
 	"
@@ -236,6 +237,9 @@ Book.prototype.createCard = function() {
 	let notReadYetDiv = document.createElement("div");
 	let idDiv = document.createElement("div");
 	let buttonsDiv = document.createElement("div");
+	
+	titleDiv.style = "word-wrap: break-word;";
+	authorDiv.style = "word-wrap: break-word;";
 	
 	titleDiv.innerText = "Title: " + this.title;
 	authorDiv.innerText = "Author: " + this.author;
