@@ -4,6 +4,9 @@ function createStyleSheet() {
 	let styleSheet = document.createElement("style");
 	styleSheet.type = 'text/css';
 	styleSheet.innerText = "\
+		html {\
+			background-image: url('./images/background_wood.jpeg');\
+		}\
 		body {\
 			padding: 20px;\
 			}\		p {\
@@ -19,10 +22,6 @@ function createStyleSheet() {
 			align-items: flex-start;\
 			justify-content: center;\
 			flex-wrap: wrap;\
-			border-style: solid;\
-			border-color: black;\
-			border-width: 2px;\
-			border-radius: 10px;\
 			padding: 20px;\
 			}\
 		#addBook {\
@@ -64,7 +63,7 @@ function removeBookFromLibrary(event) {
 
 	// Buscar el antecedente de clase 'book'
 	let bookDiv = event.currentTarget;
-	while (bookDiv.className != "book") {
+	while (! bookDiv.classList.contains("book")) {
 		bookDiv = bookDiv.parentNode;
 	}
 
@@ -81,7 +80,7 @@ function markBookAsRead(event) {
 	
 	// Buscar el antecedente de clase 'book'
 	let bookDiv = event.currentTarget;
-	while (bookDiv.className != "book") {
+	while (! bookDiv.classList.contains("book")) {
 		bookDiv = bookDiv.parentNode;
 	}
 
@@ -90,7 +89,8 @@ function markBookAsRead(event) {
 	myLibrary.forEach(function(book, index, myLibrary) {
 			if (book.id == bookId) book.notReadYet = ! book.notReadYet;
 		});
-		
+	bookDiv.classList.toggle("notReadYet");
+	 
 	showBooksInLibrary(myLibrary);
 }
 
@@ -109,7 +109,7 @@ function showBooksInLibrary() {
 			text-align: center;\
 			font-family: cursive;\
 			font-size: 26px;\
-			color: gray;\
+			color: white;\
 			margin: 0;\
 		"
 		contentElement.appendChild( libEmpty );
@@ -136,19 +136,27 @@ Book.prototype.createCard = function() {
 	let cardElement = document.createElement("div");
 	cardElement.setAttribute("data-id", this.id);
 	cardElement.className = "book";
+	if (this.notReadYet) cardElement.classList.add("notReadYet");
 	cardElement.style = "\
 			display: flex;\
 			flex-direction: column;\
 			align.items: center;\
 			justify-content: flex-start;\
+			color: white;\
+			font-size: 20px;\
 			border-style: solid;\
-			border-color: black;\
-			border-width: 1px;\
+			border-color: yellow;\
+			border-width: 2px;\
 			border-radius: 10px;\
 			padding: 10px;\
 			width: 250px;\
 			height: 120px;\
+			background-image: url('./images/background_white.jpeg');\
 	"
+	if (! this.notReadYet) {
+		cardElement.style.color = "gray";
+		cardElement.style.border = "1px solid black";
+	}
 	
 	let titleDiv = document.createElement("div");
 	let authorDiv = document.createElement("div");
@@ -161,7 +169,7 @@ Book.prototype.createCard = function() {
 	authorDiv.innerText = "Author: " + this.author;
 	numberOfPagesDiv.innerText = "Pages: " + this.numberOfPages;
 	notReadYetDiv.innerText = this.notReadYet ? "Not read yet." : "Already read.";
-	idDiv.innerText = "Id: " + this.id;
+	//idDiv.innerText = "Id: " + this.id;
 	
 	/* Buttons */
 	buttonsDiv.className = "buttons";
@@ -169,6 +177,7 @@ Book.prototype.createCard = function() {
 			display: flex;\
 			align-items: center;\
 			justify-content: start-flex;\
+			margin: 10px;\
 			gap: 2px;\
 			width: 250px;\
 			height: 20px;\
